@@ -3,6 +3,7 @@ include_once('vendor/autoload.php');
 
 use Medoo\Medoo;
 use Balsama\BostonPlateLookup\Lookup;
+use Balsama\BostonPlateLookup\Helpers;
 
 $plateNumber = $argv[1];
 if (!is_string($plateNumber)) {
@@ -24,7 +25,24 @@ if (!$existingRecord) {
 else {
     $existingRecordTimestamp = reset($existingRecord)['fetched_timestamp'];
     if ((time() - $existingRecordTimestamp) > 86400) {
-        $lookup = new Lookup($plateNumber);
+
+        $existingRecordBirthday = $database->select(
+            'birthdays',
+            ['birth_month', 'birth_monthday'],
+            ['plate_number' => $plateNumber]
+        );
+
+        if (!$existingRecordBirthday) {
+            $lookup = new Lookup($plateNumber);
+        }
+        else {
+            $existingRecordBirthday = reset($existingRecordBirthday);
+            $yearDay = Helpers::getYearDayFromMonthAndMonthday(
+                $existingRecordBirthday['birth_month'],
+                $existingRecordBirthday['birth_monthday']
+            );
+            $lookup = new Lookup($plateNumber, 'PA', $yearDay);
+        }
         $lookup->saveToDb();
     }
 }
@@ -49,5 +67,3 @@ if ($tickets) {
         print sprintf($format, $ticket['infraction'], $ticket['infraction_date'], $ticket['infraction_time'], $ticket['infraction_address']);
     }
 }
-
-$foo = 21;

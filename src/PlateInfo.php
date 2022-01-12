@@ -56,7 +56,7 @@ class PlateInfo
     {
         return $this->birthMonth;
     }
-    public function getBirthDayDay(): int
+    public function getBirthMonthDay(): int
     {
         return $this->birthDay;
     }

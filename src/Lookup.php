@@ -9,10 +9,10 @@ class Lookup
     private string $response;
     private bool $found = false;
 
-    public function __construct($plateNumber)
+    public function __construct($plateNumber, $plateType = 'PA', $yearDay = 1)
     {
         $this->plateInfo = new PlateInfo($plateNumber);
-        $this->lookupParameters = new LookupParameters($plateNumber, 'PA');
+        $this->lookupParameters = new LookupParameters($plateNumber, $plateType, $yearDay);
         $this->process();
     }
 
@@ -30,6 +30,7 @@ class Lookup
         if ($this->found) {
             $balance = ResponseParser::getBalance($this->response);
             $this->plateInfo->setIsFound(true);
+            $this->plateInfo->setBirthday($this->lookupParameters->getMonth(), $this->lookupParameters->getMonthDay());
             $this->plateInfo->setBalance($balance);
             $this->plateInfo->setFullResponse($this->response);
             if ($balance) {

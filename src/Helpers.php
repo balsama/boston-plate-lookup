@@ -39,6 +39,23 @@ class Helpers
             'infraction_address' => ['TEXT'],
         ]);
 
+        $database->create('birthdays', [
+            'id' => [
+                'INTEGER',
+                'PRIMARY KEY'
+            ],
+            'plate_number' => ['TEXT'],
+            'birth_month' => ['INTEGER'],
+            'birth_monthday' => ['INTEGER'],
+        ]);
+
         return $database;
+    }
+
+    public static function getYearDayFromMonthAndMonthday(int $month, int $monthday): int
+    {
+        $timestamp = strtotime("$month/$monthday");
+        $yearDay = date('z', $timestamp);
+        return ($yearDay + 1);
     }
 }

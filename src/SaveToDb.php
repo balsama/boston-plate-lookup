@@ -17,8 +17,29 @@ class SaveToDb
 
         $this->record = $record;
 
+        $this->insertBirthday();
         $this->insertLookup();
         $this->insertTickets();
+    }
+
+    public function insertBirthday()
+    {
+        if ($this->record->getIsFound()) {
+            $existingRecord = $this->database->select('birthdays', 'plate_number', [
+                'plate_number' => $this->record->getPlateNumber(),
+            ]);
+            if ($existingRecord) {
+                return;
+            }
+
+            $this->database->insert(
+                'birthdays',
+                [
+                    'plate_number' => $this->record->plateNumber,
+                    'birth_month' => $this->record->getBirthMonth(),
+                    'birth_monthday' => $this->record->getBirthMonthDay(),
+                ]);
+        }
     }
 
     public function insertLookup()
@@ -83,41 +104,5 @@ class SaveToDb
                 'fetched_timestamp' => $this->timestamp,
             ]
         );
-    }
-
-    public function createDb()
-    {
-        $this->database = new Medoo([
-            'type' => 'sqlite',
-            'database' => 'lookups.db'
-        ]);
-    }
-    public function createDbTables()
-    {
-        $this->database->create('lookup', [
-            'id' => [
-                'INTEGER',
-                'PRIMARY KEY'
-            ],
-            'plate_number' => ['TEXT'],
-            'found' => ['INTEGER'],
-            'balance' => ['FLOAT'],
-            'full_response' => ['TEXT'],
-            'fetched_timestamp' => ['INTEGER'],
-        ]);
-
-        $this->database->create('tickets', [
-            'id' => [
-                'INTEGER',
-                'PRIMARY KEY',
-            ],
-            'ticket_number' => ['TEXT', 'UNIQUE'],
-            'plate_number' => ['TEXT'],
-            'infraction' => ['TEXT'],
-            'fine' => ['FLOAT'],
-            'infraction_date' => ['TEXT'],
-            'infraction_time' => ['TEXT'],
-            'infraction_address' => ['TEXT'],
-        ]);
     }
 }

@@ -9,10 +9,7 @@ if (!is_string($plateNumber)) {
     throw new Exception('You must provide a plate number as an argument to this script');
 }
 
-$database = new Medoo([
-    'type' => 'sqlite',
-    'database' => 'lookups.db'
-]);
+$database = \Balsama\BostonPlateLookup\Helpers::initializeDatabase();
 
 $existingRecord = $database->select('lookup', ['plate_number', 'fetched_timestamp'], [
     'plate_number' => $plateNumber,

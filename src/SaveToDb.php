@@ -13,8 +13,7 @@ class SaveToDb
     public function __construct(PlateInfo $record)
     {
         $this->timestamp = time();
-        $this->createDb();
-        $this->createDbTables();
+        $this->database = Helpers::initializeDatabase();
 
         $this->record = $record;
 
@@ -86,14 +85,14 @@ class SaveToDb
         );
     }
 
-    private function createDb()
+    public function createDb()
     {
         $this->database = new Medoo([
             'type' => 'sqlite',
             'database' => 'lookups.db'
         ]);
     }
-    private function createDbTables()
+    public function createDbTables()
     {
         $this->database->create('lookup', [
             'id' => [
